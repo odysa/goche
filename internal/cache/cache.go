@@ -1,9 +1,11 @@
 package cache
 
-type Key = []byte
-type Value = []byte
+type Size int
 
-type Cache interface {
-	get(key Key) (Value, error)
-	set(key Key, value Value) (bool, error)
+type Value interface {
+}
+
+type Cache[K comparable, V any] interface {
+	Get(key K) (*V, error)
+	Set(key K, value V) (bool, error)
 }

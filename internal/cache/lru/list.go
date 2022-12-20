@@ -1,105 +1,50 @@
 package lru
 
-type Deque[V any] interface {
-	PushFront(value V)
-	PopFront() DequeNode[V]
-	PushBack(value V)
-	PopBack() DequeNode[V]
-	Size() ListSize
+type ListLen = uint64
+
+type DoubleList[T any] struct {
+	root *ListNode[T]
+	len  ListLen
 }
 
-type DequeNode[V any] interface {
-	GetValue() V
-	SetValue(value V)
-}
+func NewDoubleList[T any]() *DoubleList[T] {
+	var t T
+	sentinel := &ListNode[T]{value: t, prev: nil, next: nil}
+	sentinel.prev = sentinel
+	sentinel.next = sentinel
 
-type ListSize = uint64
-
-type DequeList[V any] struct {
-	tail, head *DequeListNode[V]
-	size       ListSize
-}
-
-func (l *DequeList[V]) PushFront(value V) {
-	node := newListNode(value, nil, nil)
-
-	if l.head == nil {
-		l.head = node
-		l.tail = node
-	} else {
-		node.next = l.head
-		l.head.prev = node
-		l.head = node
+	return &DoubleList[T]{
+		len:  0,
+		root: sentinel,
 	}
-
-	l.size += 1
 }
 
-func (l *DequeList[V]) PopFront() DequeNode[V] {
-	if l.head == nil {
-		return nil
-	}
-
-	node := l.head
-	next := node.next
-	node.next = nil
-
-	l.head = next
-	l.head.prev = nil
-	l.size -= 1
-
-	return node
+func (l *DoubleList[T]) Len() ListLen {
+	return l.len
 }
 
-func (l *DequeList[V]) PushBack(value V) {
-	node := newListNode(value, nil, nil)
-
-	if l.tail == nil {
-		l.tail = node
-		l.head = node
-	} else {
-		l.tail.next = node
-		node.prev = l.tail
-		l.tail = node
-	}
-
-	l.size += 1
+func (l *DoubleList[T]) PushBack(v T) {
 }
 
-func (l *DequeList[V]) PopBack() DequeNode[V] {
-	if l.tail == nil {
-		return nil
-	}
-	node := l.tail
-	prev := node.prev
-	prev.next = nil
-	l.tail.prev = nil
-	l.tail = prev
-	l.size -= 1
-	return node
+// insert value after node
+func (l *DoubleList[T]) insertAfter(v T, node *ListNode[T]) *ListNode[T] {
+	newNode := &ListNode[T]{value: v}
+
+	newNode.prev = node
+	newNode.next = node.next
+
+	newNode.prev.next = newNode
+	newNode.next.prev = newNode
+
+	l.len += 1
+	return newNode
 }
 
-func (l *DequeList[V]) Size() ListSize {
-	return l.size
+func (l *DoubleList[T]) insertBefore(v T, node *ListNode[T]) *ListNode[T] {
+	return nil
 }
 
-type DequeListNode[V any] struct {
-	value      V
-	next, prev *DequeListNode[V]
-}
-
-func (l *DequeListNode[V]) GetValue() V {
-	return l.value
-}
-
-func (l *DequeListNode[V]) SetValue(value V) {
-	l.value = value
-}
-
-func newListNode[V any](value V, prev, next *DequeListNode[V]) *DequeListNode[V] {
-	return &DequeListNode[V]{
-		value: value,
-		next:  next,
-		prev:  prev,
-	}
+type ListNode[T any] struct {
+	value      T
+	prev, next *ListNode[T]
 }
