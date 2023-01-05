@@ -15,14 +15,14 @@ func TestPushBack(t *testing.T) {
 	l := NewDoubleList[string]()
 	l.PushBack("10")
 	assert.Equal(t, l.Len(), ListLen(1))
-	assert.Equal(t, l.root.Prev().Entry(), "10")
+	assert.Equal(t, "10", *l.root.Prev().Entry())
 }
 
 func TestPushFront(t *testing.T) {
 	l := NewDoubleList[string]()
 	l.PushFront("10")
 	assert.Equal(t, l.Len(), ListLen(1))
-	assert.Equal(t, l.root.Next().Entry(), "10")
+	assert.Equal(t, "10", *l.root.Next().Entry())
 }
 
 func TestPopFront(t *testing.T) {
@@ -113,5 +113,5 @@ func TestListNodeEntry(t *testing.T) {
 		prev:  nil,
 		next:  nil,
 	}
-	assert.Equal(t, n.Entry(), entry)
+	assert.Equal(t, entry, *n.Entry())
 }

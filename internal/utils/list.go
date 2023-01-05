@@ -113,8 +113,8 @@ type ListNode[T any] struct {
 	prev, next *ListNode[T]
 }
 
-func (n *ListNode[T]) Entry() T {
-	return n.entry
+func (n *ListNode[T]) Entry() *T {
+	return &n.entry
 }
 
 func (n *ListNode[T]) Prev() *ListNode[T] {
