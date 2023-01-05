@@ -2,7 +2,9 @@ package lru
 
 import (
 	"errors"
-	"goche/internal/cache"
+
+	"github.com/odysa/goche/internal/cache"
+	"github.com/odysa/goche/internal/utils"
 )
 
 type entry[K comparable, V cache.Value] struct {
@@ -11,15 +13,15 @@ type entry[K comparable, V cache.Value] struct {
 }
 
 type Cache[K comparable, V cache.Value] struct {
-	list     *DoubleList[entry[K, V]]
-	keys     map[K]*ListNode[entry[K, V]]
-	capacity ListLen
+	list     *utils.DoubleList[entry[K, V]]
+	keys     map[K]*utils.ListNode[entry[K, V]]
+	capacity utils.ListLen
 }
 
 func (c *Cache[K, V]) Get(key K) (V, error) {
 	if node, ok := c.keys[key]; ok {
 		c.list.MoveToFront(node)
-		return node.entry.value, nil
+		return node.Entry().value, nil
 	}
 	var result V
 	return result, errors.New("not found")
@@ -27,7 +29,8 @@ func (c *Cache[K, V]) Get(key K) (V, error) {
 
 func (c *Cache[K, V]) Set(key K, value V) (bool, error) {
 	if node, ok := c.keys[key]; ok {
-		node.entry.value = value
+		entry := node.Entry()
+		entry.value = value
 		c.list.MoveToFront(node)
 		return true, nil
 	}
@@ -43,4 +46,10 @@ func (c *Cache[K, V]) Set(key K, value V) (bool, error) {
 }
 
 func (c *Cache[K, V]) removeOldest() {
+	// it should be unreachable
+	if c.list.Len() == 0 {
+		return
+	}
+	oldest := c.list.PopFront()
+	delete(c.keys, oldest.Entry().key)
 }

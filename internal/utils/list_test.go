@@ -1,4 +1,4 @@
-package lru
+package utils
 
 import (
 	"testing"
@@ -23,6 +23,53 @@ func TestPushFront(t *testing.T) {
 	l.PushFront("10")
 	assert.Equal(t, l.Len(), ListLen(1))
 	assert.Equal(t, l.root.Next().Entry(), "10")
+}
+
+func TestPopFront(t *testing.T) {
+	l := NewDoubleList[string]()
+	n1 := l.PushFront("10")
+	n2 := l.PushFront("20")
+
+	p1 := l.PopFront()
+	assert.Equal(t, l.Len(), ListLen(1))
+	assert.Equal(t, p1, n2)
+	p2 := l.PopFront()
+	assert.Equal(t, l.Len(), ListLen(0))
+	assert.Equal(t, p2, n1)
+	assert.Nil(t, l.PopFront())
+}
+
+func TestPopBack(t *testing.T) {
+	l := NewDoubleList[string]()
+	n1 := l.PushFront("10")
+	n2 := l.PushFront("20")
+
+	p1 := l.PopBack()
+	assert.Equal(t, l.Len(), ListLen(1))
+	assert.Equal(t, p1, n1)
+	p2 := l.PopBack()
+	assert.Equal(t, l.Len(), ListLen(0))
+	assert.Equal(t, p2, n2)
+	assert.Nil(t, l.PopBack())
+}
+
+func TestRemove(t *testing.T) {
+	l := NewDoubleList[string]()
+	n1 := l.PushFront("10")
+	n2 := l.PushFront("20")
+	l.remove(n1)
+	assert.Equal(t, l.Len(), ListLen(1))
+	assert.Nil(t, n1.prev)
+	assert.Nil(t, n1.next)
+	assert.Equal(t, n2.next, l.root)
+	assert.Equal(t, n2.prev, l.root)
+
+	l.remove(n2)
+	assert.Equal(t, l.Len(), ListLen(0))
+	assert.Nil(t, n2.prev)
+	assert.Nil(t, n2.next)
+	assert.Equal(t, l.root.next, l.root)
+	assert.Equal(t, l.root.prev, l.root)
 }
 
 func TestListNodePrev(t *testing.T) {
