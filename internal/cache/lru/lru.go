@@ -43,18 +43,18 @@ func (c *Cache[K, V]) Set(key K, value V) error {
 		return nil
 	}
 
-	node := c.list.PushBack(entry[K, V]{key: key, value: value})
-	c.keys[key] = node
-
 	if c.reachLimit() {
 		c.removeOldest()
 	}
+
+	node := c.list.PushBack(entry[K, V]{key: key, value: value})
+	c.keys[key] = node
 
 	return nil
 }
 
 func (c *Cache[K, V]) reachLimit() bool {
-	return cache.Size(c.list.Len()) > c.capacity
+	return cache.Size(c.list.Len()) >= c.capacity
 }
 
 func (c *Cache[K, V]) removeOldest() {
